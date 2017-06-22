@@ -29,12 +29,11 @@ define_target "ragel" do |target|
 	end
 	
 	target.depends :platform
-	target.depends "Library/z"
 	
 	target.depends "Build/Files"
 	target.depends "Build/Make"
 	
-	target.provides "Executable/ragel" do
+	target.provides "Convert/Ragel" do
 		define Rule, "convert.ragel-file" do
 			input :source_file, pattern: /\.rl/
 			output :destination_path
@@ -52,10 +51,9 @@ define_target "ragel" do |target|
 	end
 end
 
-define_configuration "test" do |configuration|
-	configuration[:source] = "https://github.com/kurocha/"
+define_configuration "ragel" do |configuration|
+	configuration.public!
 	
 	configuration.require "platforms"
-	
 	configuration.require "build-make"
 end
