@@ -45,7 +45,7 @@ define_target "ragel" do |target|
 			apply do |arguments|
 				mkpath File.dirname(arguments[:destination_path])
 				
-				run!(arguments[:ragel], arguments[:source_file], "-o", arguments[:destination_path])
+				run!(arguments[:ragel], "-G2", arguments[:source_file], "-o", arguments[:destination_path])
 			end
 		end
 	end
