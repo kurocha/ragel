@@ -8,8 +8,8 @@ teapot_version "1.0.0"
 define_target "ragel" do |target|
 	target.build do
 		source_files = Files::Directory.join(target.package.path, "ragel-6.10")
-		cache_prefix = Path.join(environment[:build_prefix], "ragel-#{environment.checksum}")
-		package_files = Path.join(environment[:install_prefix], "bin/ragel")
+		cache_prefix = environment[:build_prefix] / environment.checksum + "ragel"
+		package_files = environment[:install_prefix] / "bin/ragel"
 		
 		copy source: source_files, prefix: cache_prefix
 		
