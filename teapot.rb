@@ -3,43 +3,46 @@
 #  This file is part of the "Teapot" project, and is released under the MIT license.
 #
 
-teapot_version "1.0.0"
+teapot_version "3.0"
 
 define_target "ragel" do |target|
-	target.build do
-		source_files = Files::Directory.join(target.package.path, "ragel-6.10")
-		cache_prefix = environment[:build_prefix] / environment.checksum + "ragel"
-		package_files = environment[:install_prefix] / "bin/ragel"
-		
-		copy source: source_files, prefix: cache_prefix
-		
-		configure prefix: cache_prefix do
-			run! "autoreconf", "-fiv", chdir: cache_prefix
-			
-			run! "./configure",
-				"--prefix=#{environment[:install_prefix]}",
-				"--disable-dependency-tracking",
-				"--enable-shared=no",
-				"--enable-static=yes",
-				*environment[:configure],
-				chdir: cache_prefix
-		end
-		
-		make prefix: cache_prefix, package_files: package_files
-	end
-	
 	target.depends :platform
 	
 	target.depends "Build/Files"
 	target.depends "Build/Make"
 	
 	target.provides "Convert/Ragel" do
+		source_files = Files::Directory.join(target.package.path, "ragel-6.10")
+		
+		build_prefix = cache_prefix = environment[:build_prefix] / environment.checksum + "ragel"
+		
+		source_prefix = build_prefix + "source"
+		install_prefix = build_prefix
+		
+		ragel_binary_path = install_prefix / "bin/ragel"
+		
+		copy source: source_files, prefix: source_prefix
+		
+		configure prefix: source_prefix do
+			run! "autoreconf", "-fiv", chdir: source_prefix
+			
+			run! "./configure",
+				"--prefix=#{install_prefix}",
+				"--disable-dependency-tracking",
+				*environment[:configure],
+				chdir: source_prefix
+		end
+		
+		make prefix: source_prefix, package_files: ragel_binary_path
+		
+		ragel ragel_binary_path
+		
 		define Rule, "convert.ragel-file" do
 			input :source_file, pattern: /\.rl/
 			output :destination_path
 			
-			parameter :ragel, optional: true do |path, arguments|
-				arguments[:ragel] = path || (environment[:install_prefix] + "bin/ragel")
+			input :ragel, optional: true do |path, arguments|
+				arguments[:ragel] = environment[:ragel]
 			end
 			
 			apply do |arguments|
