@@ -54,6 +54,19 @@ define_target "ragel" do |target|
 	end
 end
 
+# Configurations
+
+define_configuration "development" do |configuration|
+	configuration[:source] = "https://github.com/kurocha/"
+	configuration.import "ragel"
+	
+	configuration.require 'generate-project'
+	configuration.require 'generate-travis'
+	
+	# Provides all the build related infrastructure:
+	configuration.require "platforms"
+end
+
 define_configuration "ragel" do |configuration|
 	configuration.public!
 	
